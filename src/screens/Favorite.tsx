@@ -10,7 +10,7 @@ const Favorite = (): JSX.Element => {
     fetchFavorites();
   }, [favorites]);
 
-  const fetchFavorites = async () => {
+  const fetchFavorites = async ():Promise<void> => {
     try {
       const favoriteData = await AsyncStorage.getItem('@FavoriteList');
       if (favoriteData !== null) {
