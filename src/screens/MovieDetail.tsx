@@ -1,16 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesome } from '@expo/vector-icons';
-import { View, Text, ImageBackground, FlatList, StyleSheet } from 'react-native';
-import MovieItem from '../components/movies/MovieItem';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from 'react'
+import { FontAwesome } from '@expo/vector-icons'
+import {
+  View,
+  Text,
+  ImageBackground,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+} from 'react-native'
+import MovieItem from '../components/movies/MovieItem'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { LinearGradient } from 'expo-linear-gradient'
+import { useFonts, Inter_600SemiBold } from '@expo-google-fonts/inter'
 
 const MovieDetail = ({ route }: any): any => {
-  const [movie, setMovie] = useState<any[]>([]);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
-  const coverType = 'poster';
-  const API_ACCESS_TOKEN = process.env.EXPO_PUBLIC_API_ACCESS_TOKEN;
-  const { id } = route.params;
+  const [movie, setMovie] = useState<any[]>([])
+  const [recommendations, setRecommendations] = useState<any[]>([])
+  const [isFavorite, setIsFavorite] = useState<boolean>(false)
+  const coverType = 'poster'
+  const API_ACCESS_TOKEN = process.env.EXPO_PUBLIC_API_ACCESS_TOKEN
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_600SemiBold,
+  })
+  const { id } = route.params
 
   const coverImageSize = {
     backdrop: {
@@ -21,166 +33,208 @@ const MovieDetail = ({ route }: any): any => {
       width: 100,
       height: 160,
     },
-  };
+  }
 
   useEffect(() => {
-    getMoviesById();
-    getRecomendations();
-    checkIfFavorite();
-  }, []);
+    if (fontsLoaded) {
+      getMoviesById()
+      getRecomendations()
+      checkIfFavorite()
+    }
+  }, [fontsLoaded])
 
   const getMoviesById = (): void => {
-    const url = `https://api.themoviedb.org/3/movie/${id}`;
+    const url = `https://api.themoviedb.org/3/movie/${id}`
     const options = {
       method: 'GET',
       headers: {
         accept: 'application/json',
         Authorization: `Bearer ${API_ACCESS_TOKEN}`,
       },
-    };
+    }
 
     fetch(url, options)
       .then(async (response) => await response.json())
       .then((response) => {
-        setMovie(response);
+        setMovie(response)
       })
       .catch((errorResponse) => {
-        console.log(errorResponse);
-      });
-  };
+        console.log(errorResponse)
+      })
+  }
 
   const getRecomendations = (): void => {
-    const url = `https://api.themoviedb.org/3/movie/${id}/recommendations`;
+    const url = `https://api.themoviedb.org/3/movie/${id}/recommendations`
     const options = {
       method: 'GET',
       headers: {
         accept: 'application/json',
         Authorization: `Bearer ${API_ACCESS_TOKEN}`,
       },
-    };
+    }
 
     fetch(url, options)
       .then(async (response) => await response.json())
       .then((response) => {
-        setRecommendations(response.results);
+        setRecommendations(response.results)
       })
       .catch((errorResponse) => {
-        console.log(errorResponse);
-      });
-  };
+        console.log(errorResponse)
+      })
+  }
 
   const checkIfFavorite = async () => {
     try {
-      const initialData = await AsyncStorage.getItem('@FavoriteList');
+      const initialData = await AsyncStorage.getItem('@FavoriteList')
       if (initialData !== null) {
-        const favMovieList = JSON.parse(initialData);
-        const isFav = favMovieList.some((favMovie: any) => favMovie.id === id);
-        setIsFavorite(isFav);
+        const favMovieList = JSON.parse(initialData)
+        const isFav = favMovieList.some((favMovie: any) => favMovie.id === id)
+        setIsFavorite(isFav)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   const toggleFavorite = async () => {
     try {
-      const initialData = await AsyncStorage.getItem('@FavoriteList');
-      let favMovieList = initialData !== null ? JSON.parse(initialData) : [];
+      const initialData = await AsyncStorage.getItem('@FavoriteList')
+      let favMovieList = initialData !== null ? JSON.parse(initialData) : []
 
       if (isFavorite) {
-        favMovieList = favMovieList.filter((favMovie: any) => favMovie.id !== id);
+        favMovieList = favMovieList.filter(
+          (favMovie: any) => favMovie.id !== id,
+        )
       } else {
-        favMovieList.push(movie);
+        favMovieList.push(movie)
       }
 
-      await AsyncStorage.setItem('@FavoriteList', JSON.stringify(favMovieList));
-      setIsFavorite(!isFavorite);
+      await AsyncStorage.setItem('@FavoriteList', JSON.stringify(favMovieList))
+      setIsFavorite(!isFavorite)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
+
+  if (!fontsLoaded && !fontError) {
+    return null
+  }
 
   return (
-    <View
+    <ScrollView
       style={{
         display: 'flex',
-        padding: 8,
+        backgroundColor: '#1C1221',
       }}
     >
-      {/* <Text>Movie Detail: {id}</Text> */}
       <ImageBackground
         resizeMode="cover"
         style={styles.backgroundImage}
-        // imageStyle={styles.backgroundImageStyle}
+        imageStyle={styles.backgroundImageStyle}
         source={{
           uri: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
         }}
       >
-        <Text style={styles.movieTitle}>{movie.original_title}</Text>
-        <View style={styles.bottomContainer}>
-          <View style={styles.ratingContainer}>
-            <FontAwesome name="star" size={16} color="yellow" />
-            <Text style={styles.rating}>{movie.vote_average}</Text>
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.6)']}
+          style={styles.gradient}
+        >
+          <View>
+            <Text style={styles.movieTitle}>{movie.original_title}</Text>
+            <Text style={styles.movieDate}>{movie.release_date}</Text>
+            <FlatList
+              contentContainerStyle={styles.movieGenreList}
+              data={movie.genres}
+              horizontal
+              renderItem={({ item }) => (
+                <View style={styles.movieGenre}>
+                  <Text style={styles.movieGenreItem}>{item.name}</Text>
+                </View>
+              )}
+              keyExtractor={(item) => item.id.toString()}
+            />
+            <View style={styles.bottomContainer}>
+              <View style={styles.ratingContainer}>
+                <FontAwesome name="star" size={25} color="yellow" />
+                <Text style={styles.rating}>{movie.vote_average}</Text>
+              </View>
+              <FontAwesome
+                name={isFavorite ? 'heart' : 'heart-o'}
+                size={25}
+                color="red"
+                onPress={toggleFavorite}
+              />
+            </View>
           </View>
-          <FontAwesome
-            name={isFavorite ? 'heart' : 'heart-o'}
-            size={16}
-            color="red"
-            onPress={toggleFavorite}
-          />
-        </View>
+        </LinearGradient>
       </ImageBackground>
 
-      <Text>{movie.overview}</Text>
+      <View style={styles.content}>
+        <Text style={styles.overviewText}>{movie.overview}</Text>
+        
+          {/* <FlatList 
+            data={movie.production_countries}
+            renderItem={({ item }) => (
+              <Text>{getUnicodeFlagIcon(item.iso_3166_1)}</Text>
+            )}
+            keyExtractor={(item) => item.iso_3166_1}
+          /> */}
+          
+        <View style={styles.header}>
+          <Text style={styles.title}>Recomendations</Text>
+        </View>
 
-      <View style={styles.header}>
-        <View style={styles.purpleLabel}></View>
-        <Text style={styles.title}>Recomendations</Text>
+        <FlatList
+          style={{
+            ...styles.movieList,
+            maxHeight: coverImageSize[coverType].height,
+          }}
+          showsHorizontalScrollIndicator={false}
+          horizontal
+          data={recommendations}
+          renderItem={({ item }) => (
+            <MovieItem
+              movie={item}
+              size={coverImageSize[coverType]}
+              coverType={coverType}
+            />
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
       </View>
-
-      <FlatList
-        style={{
-          ...styles.movieList,
-          maxHeight: coverImageSize[coverType].height,
-        }}
-        showsHorizontalScrollIndicator={false}
-        horizontal
-        data={recommendations}
-        renderItem={({ item }) => (
-          <MovieItem
-            movie={item}
-            size={coverImageSize[coverType]}
-            coverType={coverType}
-          />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
-    </View>
-  );
-};
+    </ScrollView>
+  )
+}
 
 const styles = StyleSheet.create({
   backgroundImage: {
-    width: 400,
-    height: 200,
+    width: '100%',
+    height: 500,
     justifyContent: 'flex-end',
-    padding: 8,
   },
   backgroundImageStyle: {
-    borderRadius: 8,
+    resizeMode: 'stretch',
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+  },
+  overviewText: {
+    fontFamily: 'Inter_600SemiBold',
+    textAlign: 'justify',
+    color: 'white',
+    lineHeight: 18,
   },
   movieTitle: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 24,
+    textAlign: 'center',
   },
-  gradientStyle: {
-    padding: 8,
-    height: '100%',
-    width: '100%',
-    borderRadius: 8,
-    display: 'flex',
-    justifyContent: 'flex-end',
+  content: {
+    padding: 16,
   },
   bottomContainer: {
     display: 'flex',
@@ -197,6 +251,7 @@ const styles = StyleSheet.create({
   rating: {
     color: 'yellow',
     fontWeight: '700',
+    marginLeft: 4,
   },
   header: {
     marginVertical: 16,
@@ -204,17 +259,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  purpleLabel: {
-    width: 20,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#8978A4',
-    marginRight: 12,
-  },
   title: {
     fontSize: 20,
     fontWeight: '900',
+    color: 'white',
   },
-});
+  movieList: {
+    flexGrow: 0,
+  },
+  movieDate: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  movieGenreList: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  movieGenre: {
+    backgroundColor: '#8978A4',
+    borderRadius: 5,
+    padding: 4,
+    marginHorizontal: 4,
+  },
+  movieGenreItem: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
+    marginHorizontal: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+})
 
-export default MovieDetail;
+export default MovieDetail

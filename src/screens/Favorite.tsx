@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MovieItem from '../components/movies/MovieItem';
 
@@ -10,12 +10,12 @@ const Favorite = (): JSX.Element => {
     fetchFavorites();
   }, [favorites]);
 
-  const fetchFavorites = async ():Promise<void> => {
+  const fetchFavorites = async (): Promise<void> => {
     try {
       const favoriteData = await AsyncStorage.getItem('@FavoriteList');
       if (favoriteData !== null) {
         const parsedData = JSON.parse(favoriteData);
-        // Pastikan setiap item memiliki properti `id`
+        // Ensure each item has an `id` property
         const validFavorites = parsedData.filter((item: any) => item.id);
         setFavorites(validFavorites);
       }
@@ -24,6 +24,11 @@ const Favorite = (): JSX.Element => {
     }
   };
 
+  const screenWidth = Dimensions.get('window').width;
+  const numColumns = 3;
+  const padding = 16;
+  const itemWidth = (screenWidth - (padding * (numColumns + 1))) / numColumns;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Favorite Movies</Text>
@@ -31,11 +36,12 @@ const Favorite = (): JSX.Element => {
         <FlatList
           data={favorites}
           renderItem={({ item }) => (
-            <MovieItem movie={item} size={{ width: 100, height: 160 }} coverType="poster" />
+            <View style={{ width: itemWidth, margin: padding / 2 }}>
+              <MovieItem movie={item} size={{ width: itemWidth, height: 160 }} coverType="poster" />
+            </View>
           )}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={3} // Menentukan jumlah kolom menjadi 3
-          contentContainerStyle={styles.list}
+          numColumns={numColumns}
         />
       ) : (
         <Text style={styles.noFavorites}>No favorite movies yet</Text>
@@ -48,19 +54,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    alignContent: 'center',
+    backgroundColor: '#1C1221',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-  },
-  list: {
-    gap: 16,
+    color: 'white',
+    textAlign: 'center',
   },
   noFavorites: {
     fontSize: 18,
     color: 'gray',
+    textAlign: 'center',
   },
 });
 

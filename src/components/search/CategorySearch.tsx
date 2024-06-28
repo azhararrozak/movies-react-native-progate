@@ -13,7 +13,9 @@ export default function CategorySearch(): JSX.Element {
   const [categories, setCategories] = useState<any[]>([])
   const [selectedButton, setSelectedButton] = useState<number | null>(null)
   const navigation = useNavigation()
- const pushAction = StackActions.push('CategorySearchResult', { id: selectedButton })
+  const pushAction = StackActions.push('CategorySearchResult', {
+    id: selectedButton,
+  })
 
   useEffect(() => {
     getCategories()
@@ -59,12 +61,14 @@ export default function CategorySearch(): JSX.Element {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <Button
-        title="Search"
+      <TouchableOpacity
+        style={styles.searchButton}
         onPress={() => {
           navigation.dispatch(pushAction)
         }}
-      />
+      >
+        <Text style={styles.searchButtonText}>Search</Text>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -81,14 +85,25 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     backgroundColor: '#7896eb',
-    borderRadius: 10,
+    borderRadius: 15,
   },
   selectedButton: {
     backgroundColor: '#3700B3', // Change the color when selected
   },
-
   buttonText: {
     color: '#fff',
     textAlign: 'center',
+  },
+  searchButton: {
+    borderRadius: 15,
+    backgroundColor: '#7896eb',
+    padding: 15,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  searchButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 })

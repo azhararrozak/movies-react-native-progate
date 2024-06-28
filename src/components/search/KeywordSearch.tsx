@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
 import MovieItem from '../movies/MovieItem';
+import { FontAwesome } from '@expo/vector-icons'
 
 const API_KEY = process.env.EXPO_PUBLIC_API_ACCESS_TOKEN; // Ganti dengan kunci API TMDB Anda
 
@@ -33,7 +34,6 @@ export default function KeywordSearch(): JSX.Element {
     <View>
       <TextInput
         style={styles.input}
-        placeholder="Type a keyword"
         onChangeText={(text) => setKeyword(text)}
         value={keyword}
         onSubmitEditing={handleSearch}
@@ -56,16 +56,18 @@ export default function KeywordSearch(): JSX.Element {
 
 const styles = StyleSheet.create({
   input: {
-    height: 40,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 8,
+    height: 50,
+    paddingHorizontal: 15,
+    borderRadius: 20,
     marginVertical: 20,
+    color: 'white',
+    backgroundColor: '#382645'
   },
   noResultsText: {
     fontSize: 16,
     textAlign: 'center',
     marginTop: 20,
+    color: 'white'
   },
   list: {
     alignItems: 'center',
