@@ -44,7 +44,9 @@ export default function CategorySearchResult({ route }: any): any {
   }
 
   return (
-    <View>
+    <View style={{
+      backgroundColor: '#1C1221'
+    }}>
       <FlatList
         data={moviesByCategory}
         renderItem={({ item }) => (

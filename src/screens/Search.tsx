@@ -16,11 +16,13 @@ const Search = (): JSX.Element => {
               activeOpacity={0.9}
               style={{
                 ...styles.topBar,
-                backgroundColor: item === selectedBar ? '#8978A4' : '#C0B4D5',
+                backgroundColor: item === selectedBar ? '#C9ACDF' : '#1C1221',
                 borderTopLeftRadius: index === 0 ? 100 : 0,
                 borderBottomLeftRadius: index === 0 ? 100 : 0,
                 borderTopRightRadius: index === 1 ? 100 : 0,
                 borderBottomRightRadius: index === 1 ? 100 : 0,
+                borderWidth: 2,
+                borderColor: '#C9ACDF',
               }}
               onPress={() => {
                 setSelectedBar(item)
@@ -39,6 +41,9 @@ const Search = (): JSX.Element => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    backgroundColor: '#1C1221',
+    height: '100%',
+    
   },
   topBarContainer: {
     display: 'flex',
@@ -50,12 +55,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '50%',
     height: 60,
+    
   },
   topBarLabel: {
-    color: 'white',
     fontSize: 20,
     fontWeight: '400',
     textTransform: 'capitalize',
+    color: '#fff',
   },
 })
 

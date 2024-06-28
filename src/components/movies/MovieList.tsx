@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, FlatList } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Platform } from 'react-native'
 import type { MovieListProps, Movie } from '../../types/app'
 import MovieItem from './MovieItem'
+import { useFonts, Inter_700Bold } from '@expo-google-fonts/inter';
 
 const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
     const API_ACCESS_TOKEN = process.env.EXPO_PUBLIC_API_ACCESS_TOKEN
   const [movies, setMovies] = useState<Movie[]>([])
+  
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      getMovieList();
+    }
+  }, [fontsLoaded]);
 
   const coverImageSize = {
     backdrop: {
@@ -17,10 +28,6 @@ const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
       height: 160,
     },
   }
-
-  useEffect(() => {
-    getMovieList()
-  }, [])
 
   const getMovieList = (): void => {
     const url = `https://api.themoviedb.org/3/${path}`
@@ -42,10 +49,13 @@ const MovieList = ({ title, path, coverType }: MovieListProps): JSX.Element => {
       })
   }
 
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <View>
       <View style={styles.header}>
-        <View style={styles.purpleLabel}></View>
         <Text style={styles.title}>{title}</Text>
       </View>
       <FlatList
@@ -85,7 +95,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '900',
+    color: 'white',
+    marginVertical: 8,
+    fontFamily: 'Inter_700Bold',
   },
   movieList: {
     paddingLeft: 4,

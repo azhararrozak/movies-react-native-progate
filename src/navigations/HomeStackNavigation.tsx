@@ -8,8 +8,19 @@ const Stack = createNativeStackNavigator()
 export default function HomeStackNavigation(): JSX.Element {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Homescreen" component={Home} />
-      <Stack.Screen name="MovieDetail" component={MovieDetail} />
+      <Stack.Screen
+        name="Homescreen"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MovieDetail"
+        component={MovieDetail}
+        options={{
+          headerTransparent: true,
+          headerTitle: '',
+        }}
+      />
     </Stack.Navigator>
   )
 }
